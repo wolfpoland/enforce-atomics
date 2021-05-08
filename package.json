@@ -1,0 +1,19 @@
+{
+  "name": "enforce-atomics",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "jest": "jest"
+  },
+  "jest": {
+    "preset": "jest-preset-stylelint"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "jest": "^26.6.3",
+    "jest-preset-stylelint": "^3.0.0",
+    "stylelint": "^13.13.1"
+  }
+}
