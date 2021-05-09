@@ -4,7 +4,6 @@ const postcss = require('postcss');
 const stylelint = require('stylelint');
 
 const ruleName = 'plugin/enforce-atomics';
-const separator = '-__-'
 
 const messages = stylelint.utils.ruleMessages(ruleName, {
     rejected: 'Consider use of '
@@ -13,62 +12,89 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 module.exports = stylelint.createPlugin(
     ruleName,
     function rule(primary, options = {}) {
-    return (root, result) => {
-        if (!options.css) {
-            return;
-        }
-
-        const rootCss = postcss.parse(options.css);
-
-        const resMap = buildMap(rootCss);
-
-        root.walkRules(checkAtomics);
-
-
-        function buildMap(rootCssProp) {
-            const map = new Map();
-
-            rootCssProp.walkRules(processSelector);
-
-            function processSelector(statement) {
-
-                const key = creteKey(statement);
-
-                map.set(key, statement.selector);
+        return (root, result) => {
+            if (!options.css) {
+                return;
             }
 
-            return map;
-        }
+            const rootCss = postcss.parse(options.css);
 
-        function checkAtomics(statement) {
+            const {propertiesMap, selectorsMap} = buildMap(rootCss);
 
-            const key = creteKey(statement);
-            const res = resMap.get(key);
+            root.walkRules(checkAtomics);
 
 
-            if (res) {
-                stylelint.utils.report({
-                    message: `${messages.rejected} ${key}`,
-                    node: statement,
-                    result,
-                    ruleName
+            function buildMap(rootCssProp) {
+                const propertiesMap = new Map();
+                const selectorsMap = new Map();
+
+                rootCssProp.walkRules(processSelector);
+
+                function processSelector(statement) {
+                    seedMaps(statement, propertiesMap, selectorsMap);
+                }
+
+                return {propertiesMap, selectorsMap};
+            }
+
+            function checkAtomics(statement) {
+                const atomicsMap = new Map();
+                seedAtomicsMap(atomicsMap, statement);
+                reportWhenAtomicIsPresent(atomicsMap, statement);
+            }
+
+            function seedMaps(statement, propertiesMap, selectorsMap) {
+                const properties = new Map();
+                const selectorMetaData = {length: statement.nodes.length, selector: statement.selector};
+
+                statement.nodes.forEach((node) => {
+                    const key = `${node.prop}-${node.value}`;
+                    propertiesMap.set(key, selectorMetaData);
+                    properties.set(key, false);
+                });
+
+                selectorsMap.set(statement.selector, properties);
+            }
+
+            function seedAtomicsMap(atomicsMap, statement) {
+                statement.nodes.forEach((node) => {
+                    const key = `${node.prop}-${node.value}`;
+                    const propertyContext = propertiesMap.get(key);
+                    if (!propertyContext) {
+                        return;
+                    }
+
+                    const selectorName = propertyContext.selector;
+
+                    if (!atomicsMap.has(selectorName)) {
+                        const selectorContext = selectorsMap.get(propertyContext.selector);
+                        atomicsMap.set(selectorName, new Map(selectorContext))
+                    }
+
+                    const atomic = atomicsMap.get(selectorName);
+                    atomic.set(key, true);
                 });
             }
-        }
 
-        function creteKey(statement) {
-            const selectorProperties = [];
+            function reportWhenAtomicIsPresent(atomicsMap, statement) {
+                atomicsMap.forEach((value, key) => {
+                    const propertyEntries = Array.from(value.values());
 
-            statement.nodes.forEach((node) => {
-                selectorProperties.push(`${node.prop}-${node.value}`)
-            });
+                    const isReportNecessary = propertyEntries.every((property) => !!property);
 
-            selectorProperties.sort();
+                    if(isReportNecessary) {
+                        stylelint.utils.report({
+                            message: `${messages.rejected} ${key}`,
+                            node: statement,
+                            result,
+                            ruleName
+                        });
+                    }
 
-            return selectorProperties.join(separator);
-        }
-    };
-});
+                });
+            }
+        };
+    });
 
 module.exports.ruleName = ruleName;
 module.exports.messages = messages;

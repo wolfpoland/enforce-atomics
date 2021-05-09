@@ -9,7 +9,7 @@
   "jest": {
     "preset": "jest-preset-stylelint"
   },
-  "author": "",
+  "author": "Patryk Krasuski",
   "license": "MIT",
   "dependencies": {
     "jest": "^26.6.3",

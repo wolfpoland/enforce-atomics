@@ -32,10 +32,11 @@ testRule({
     reject: [
         {
             code: '.test-class { color: red; } .test-class2 { color: white; background: black; }',
-            message: `${messages.rejected} background-black-color-white`
+            message: `${messages.rejected} test-fg-white`
         },
         {
-            code: '.test-class { position: absolute; color: white; display: block; }'
+            code: '.test-class { position: absolute; color: white; display: block; }',
+            message: `${messages.rejected} test-display-block`
         }
     ],
 });
