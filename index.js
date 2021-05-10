@@ -2,7 +2,7 @@
 
 const postcss = require('postcss');
 const stylelint = require('stylelint');
-
+const fs = require('fs')
 const ruleName = 'plugin/enforce-atomics';
 
 const messages = stylelint.utils.ruleMessages(ruleName, {
@@ -17,7 +17,8 @@ module.exports = stylelint.createPlugin(
                 return;
             }
 
-            const rootCss = postcss.parse(options.css);
+            const data = fs.readFileSync(options.css, 'utf8')
+            const rootCss = postcss.parse(data);
 
             const {propertiesMap, selectorsMap} = buildMap(rootCss);
 

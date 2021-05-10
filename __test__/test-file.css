@@ -1,0 +1,13 @@
+test-fg-red {
+    color: red;
+    background: white;
+}
+
+test-fg-white {
+    background: black;
+    color: white;
+}
+
+test-display-block {
+    display: block;
+}

@@ -2,26 +2,10 @@
 
 const {ruleName, messages} = require('../index');
 
-const css = `
-	test-fg-red {
-		color: red;
-		background: white;
-	}
-
-	test-fg-white {
-	    background: black;
-		color: white;
-	}
-	
-	test-display-block {
-		display: block;
-	}
-`;
-
 testRule({
     plugins: ["./index.js"],
     ruleName,
-    config: [true, {css}],
+    config: [true, {css: '__test__/test-file.css'}],
 
     accept: [
         {
