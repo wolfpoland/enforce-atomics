@@ -1,12 +1,13 @@
 'use strict';
 
+const path = require("path");
 const postcss = require('postcss');
 const stylelint = require('stylelint');
 const fs = require('fs')
 const ruleName = 'plugin/enforce-atomics';
 
 const messages = stylelint.utils.ruleMessages(ruleName, {
-    rejected: 'Consider use of '
+    rejected: (atomicClass) => `Consider use of ${atomicClass.replace('\\32xl\\:','')}`
 });
 
 module.exports = stylelint.createPlugin(
@@ -14,10 +15,10 @@ module.exports = stylelint.createPlugin(
     function rule(primary, options = {}) {
         return (root, result) => {
             if (!options.css) {
-                return;
+                options.css = 'node_modules/tailwindcss/dist/tailwind.css';
             }
 
-            const data = fs.readFileSync(options.css, 'utf8')
+            const data = fs.readFileSync(path.resolve(__dirname, options.css), 'utf8')
             const rootCss = postcss.parse(data);
 
             const {propertiesMap, selectorsMap} = buildMap(rootCss);
@@ -41,7 +42,7 @@ module.exports = stylelint.createPlugin(
             function checkAtomics(statement) {
                 const atomicsMap = new Map();
                 seedAtomicsMap(atomicsMap, statement);
-                reportWhenAtomicIsPresent(atomicsMap, statement);
+                reportWhenAtomicIsPresent(atomicsMap);
             }
 
             function seedMaps(statement, propertiesMap, selectorsMap) {
@@ -73,23 +74,25 @@ module.exports = stylelint.createPlugin(
                     }
 
                     const atomic = atomicsMap.get(selectorName);
-                    atomic.set(key, true);
+                    atomic.set(key, node);
                 });
             }
 
-            function reportWhenAtomicIsPresent(atomicsMap, statement) {
+            function reportWhenAtomicIsPresent(atomicsMap) {
                 atomicsMap.forEach((value, key) => {
                     const propertyEntries = Array.from(value.values());
 
                     const isReportNecessary = propertyEntries.every((property) => !!property);
 
                     if(isReportNecessary) {
-                        stylelint.utils.report({
-                            message: `${messages.rejected} ${key}`,
-                            node: statement,
-                            result,
-                            ruleName
-                        });
+                        propertyEntries.forEach((property) => {
+                            stylelint.utils.report({
+                                message: messages.rejected(key),
+                                node: property,
+                                result,
+                                ruleName
+                            });
+                        })
                     }
 
                 });
