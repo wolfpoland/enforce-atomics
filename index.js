@@ -7,15 +7,26 @@ const fs = require('fs')
 const ruleName = 'plugin/enforce-atomics';
 
 const messages = stylelint.utils.ruleMessages(ruleName, {
-    rejected: (atomicClass) => `Consider use of ${atomicClass.replace('\\32xl\\:','')}`
+    rejected: (atomicClass) => `Consider use of ${atomicClass.replace('\\32xl\\:', '')}`
 });
 
 module.exports = stylelint.createPlugin(
     ruleName,
     function rule(primary, options = {}) {
         return (root, result) => {
+            let dirname = __dirname;
+            let propertyWhitelistSet;
+
             if (!options.css) {
                 options.css = 'node_modules/tailwindcss/dist/tailwind.css';
+            } else {
+                dirname = __dirname.split('/')
+                const dirnameLength = dirname.length;
+                dirname.length = dirnameLength - 2;
+            }
+
+            if (options.propertiesWhitelist) {
+                propertyWhitelistSet = handlePropertyWhiteList();
             }
 
             const data = fs.readFileSync(path.resolve(__dirname, options.css), 'utf8')
@@ -50,6 +61,9 @@ module.exports = stylelint.createPlugin(
                 const selectorMetaData = {length: statement.nodes.length, selector: statement.selector};
 
                 statement.nodes.forEach((node) => {
+                    if (propertyWhitelistSet && (!propertyWhitelistSet.has(node.prop))) {
+                        return;
+                    }
                     const key = `${node.prop}-${node.value}`;
                     propertiesMap.set(key, selectorMetaData);
                     properties.set(key, false);
@@ -84,7 +98,7 @@ module.exports = stylelint.createPlugin(
 
                     const isReportNecessary = propertyEntries.every((property) => !!property);
 
-                    if(isReportNecessary) {
+                    if (isReportNecessary) {
                         propertyEntries.forEach((property) => {
                             stylelint.utils.report({
                                 message: messages.rejected(key),
@@ -96,6 +110,35 @@ module.exports = stylelint.createPlugin(
                     }
 
                 });
+            }
+
+            function handlePropertyWhiteList() {
+                const set = new Set();
+                if (!Array.isArray(options.propertiesWhitelist)) {
+                    throw new Error('propertiesWhitelist must be a array of strings!');
+                }
+
+                options.propertiesWhitelist.forEach((property) => {
+                    if (typeof property !== "string") {
+                        throw new Error(`propertiesWhitelist must be a array of strings! You provided ${typeof property}`);
+                    }
+
+                    set.add(property);
+                });
+
+                return set;
+            }
+
+            function checkPropertyWhitelist(prop) {
+                for(const property of propertyWhitelistSet) {
+                    const includesIndex = property.indexOf('-*');
+                    const whitelistedProperty = property.replace('-*', '')
+                    if (includesIndex !== -1) {
+                        return prop.include(whitelistedProperty)
+                    } else {
+                        return property === prop;
+                    }
+                }
             }
         };
     });

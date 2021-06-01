@@ -1,13 +1,17 @@
-test-fg-red {
+.test-fg-red {
     color: red;
     background: white;
 }
 
-test-fg-white {
+.test-fg-white {
     background: black;
     color: white;
 }
 
-test-display-block {
+.test-display-block {
     display: block;
+}
+
+.test-full-width {
+    width: 100%;
 }
