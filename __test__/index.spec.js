@@ -5,17 +5,17 @@ const {ruleName} = require('../index');
 testRule({
     plugins: ["./index.js"],
     ruleName,
-    config: [true, {css: '__test__/test-file.css'}],
+    config: [true, {css: 'projekty/enforce-atomics/__test__/test-file.css'}],
 
     accept: [
         {
-            code: '.test-class { position: absolute; color: white; display: flex }'
+            code: '.test-class { position: absolute; color: white; }'
         }
     ],
 
     reject: [
         {
-            code: '.test-class { color: red; } .test-class2 { color: white; background: black; }',
+            code: '.test-class { color: red; } .test-class2 { color: white; background: black; display: flex;}',
             warnings: [
                 {
                     message: 'Consider use of .test-fg-white (plugin/enforce-atomics)',
@@ -26,12 +26,21 @@ testRule({
                     message: 'Consider use of .test-fg-white (plugin/enforce-atomics)',
                     column: 44,
                     line: 1
+                },
+                {
+                    column: 77,
+                    line: 1,
+                    message: "Consider use of .test-flex (plugin/enforce-atomics)"
                 }
             ],
         },
         {
             code: '.test-class { position: absolute; color: white; display: block; }',
             message: 'Consider use of .test-display-block (plugin/enforce-atomics)'
+        },
+        {
+            code: '.test-class { display: flex; }',
+            message: 'Consider use of .test-flex (plugin/enforce-atomics)'
         }
     ],
 });
@@ -39,7 +48,7 @@ testRule({
 testRule({
     plugins: ["./index.js"],
     ruleName,
-    config: [true, {css: '__test__/test-file.css', propertiesWhitelist: ['display', 'width']}],
+    config: [true, {css: 'projekty/enforce-atomics/__test__/test-file.css', propertiesWhitelist: ['display', 'width']}],
 
     accept: [
         {

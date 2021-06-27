@@ -17,19 +17,21 @@ module.exports = stylelint.createPlugin(
             let dirname = __dirname;
             let propertyWhitelistSet;
 
+
             if (!options.css) {
                 options.css = 'node_modules/tailwindcss/dist/tailwind.css';
             } else {
                 dirname = __dirname.split('/')
                 const dirnameLength = dirname.length;
                 dirname.length = dirnameLength - 2;
+                dirname = dirname.join('/')
             }
 
             if (options.propertiesWhitelist) {
                 propertyWhitelistSet = handlePropertyWhiteList();
             }
 
-            const data = fs.readFileSync(path.resolve(__dirname, options.css), 'utf8')
+            const data = fs.readFileSync(path.resolve(dirname, options.css), 'utf8')
             const rootCss = postcss.parse(data);
 
             const {propertiesMap, selectorsMap} = buildMap(rootCss);
@@ -60,12 +62,23 @@ module.exports = stylelint.createPlugin(
                 const properties = new Map();
                 const selectorMetaData = {length: statement.nodes.length, selector: statement.selector};
 
+                if(!statement.selector.match('[.][a-z]+[-]')) {
+                    return;
+                }
+
                 statement.nodes.forEach((node) => {
                     if (propertyWhitelistSet && (!propertyWhitelistSet.has(node.prop))) {
                         return;
                     }
+
                     const key = `${node.prop}-${node.value}`;
-                    propertiesMap.set(key, selectorMetaData);
+
+                    const propertiesArr = propertiesMap.get(key) ?? [];
+
+                    propertiesMap.set(key, [
+                        ...propertiesArr,
+                        selectorMetaData
+                    ]);
                     properties.set(key, false);
                 });
 
@@ -75,20 +88,23 @@ module.exports = stylelint.createPlugin(
             function seedAtomicsMap(atomicsMap, statement) {
                 statement.nodes.forEach((node) => {
                     const key = `${node.prop}-${node.value}`;
-                    const propertyContext = propertiesMap.get(key);
-                    if (!propertyContext) {
+                    const propertiesContext = propertiesMap.get(key);
+
+                    if (!propertiesContext) {
                         return;
                     }
 
-                    const selectorName = propertyContext.selector;
+                    propertiesContext.forEach((propertyContext) => {
+                        const selectorName = propertyContext.selector;
 
-                    if (!atomicsMap.has(selectorName)) {
-                        const selectorContext = selectorsMap.get(propertyContext.selector);
-                        atomicsMap.set(selectorName, new Map(selectorContext))
-                    }
+                        if (!atomicsMap.has(selectorName)) {
+                            const selectorContext = selectorsMap.get(propertyContext.selector);
+                            atomicsMap.set(selectorName, new Map(selectorContext))
+                        }
 
-                    const atomic = atomicsMap.get(selectorName);
-                    atomic.set(key, node);
+                        const atomic = atomicsMap.get(selectorName);
+                        atomic.set(key, node);
+                    })
                 });
             }
 
@@ -130,7 +146,7 @@ module.exports = stylelint.createPlugin(
             }
 
             function checkPropertyWhitelist(prop) {
-                for(const property of propertyWhitelistSet) {
+                for (const property of propertyWhitelistSet) {
                     const includesIndex = property.indexOf('-*');
                     const whitelistedProperty = property.replace('-*', '')
                     if (includesIndex !== -1) {
