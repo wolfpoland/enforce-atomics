@@ -73,7 +73,7 @@ module.exports = stylelint.createPlugin(
 
                     const key = `${node.prop}-${node.value}`;
 
-                    const propertiesArr = propertiesMap.get(key) ?? [];
+                    const propertiesArr = propertiesMap.get(key) || [];
 
                     propertiesMap.set(key, [
                         ...propertiesArr,
