@@ -19,7 +19,7 @@ module.exports = stylelint.createPlugin(
 
 
             if (!options.css) {
-                options.css = 'node_modules/tailwindcss/dist/tailwind.css';
+               throw new Error('Css option property must be set!')
             } else {
                 dirname = __dirname.split('/')
                 const dirnameLength = dirname.length;
@@ -62,7 +62,7 @@ module.exports = stylelint.createPlugin(
                 const properties = new Map();
                 const selectorMetaData = {length: statement.nodes.length, selector: statement.selector};
 
-                if(!statement.selector.match('[.][a-z]+[-]')) {
+                if(!statement.selector.match('^[\\.]+([a-z]+[-]+[a-z]+[-]*)+$')) {
                     return;
                 }
 

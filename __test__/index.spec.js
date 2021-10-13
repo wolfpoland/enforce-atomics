@@ -10,6 +10,9 @@ testRule({
     accept: [
         {
             code: '.test-class { position: absolute; color: white; }'
+        },
+        {
+            code: '.test-class { background: pink; }'
         }
     ],
 
@@ -80,16 +83,4 @@ testRule({
     ],
 });
 
-testRule({
-    plugins: ["./index.js"],
-    ruleName,
-    config: [true, {css: ''}],
-
-    reject: [
-        {
-            code: '.test-class { width:100% }',
-            message: 'Consider use of .w-full (plugin/enforce-atomics)'
-        }
-    ]
-});
 
