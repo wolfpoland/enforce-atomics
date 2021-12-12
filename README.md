@@ -1,4 +1,3 @@
-
 # enforce-atomics
 
 Plugin for stylelint to enforcing usage of atomic classes from tailwind or external CSS file
@@ -25,8 +24,7 @@ for example
       }
     }
 
-
-you can customize plugin by config: 
+you can customize plugin by config:
 
     config [
       css: './externalFilePath.css' // Allows providing external css file [Default is tailwind dist file]

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // const path = require("path");
 // const postcss = require('postcss');
@@ -159,11 +159,10 @@
 //         };
 //     });
 
-const {run, messages,} = require("./dist/main");
-const {config} = require("./dist/config");
+const { run, messages } = require("./dist/main");
+const { config } = require("./dist/config");
 
 module.exports = run();
 
 module.exports.ruleName = config.ruleName;
 module.exports.messages = messages;
-

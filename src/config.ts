@@ -1,3 +1,3 @@
 export const config = {
-    ruleName: 'plugin/enforce-atomics'
-}
+  ruleName: "plugin/enforce-atomics",
+};
