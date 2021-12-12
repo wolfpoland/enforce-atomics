@@ -1,6 +1,6 @@
 {
   "name": "stylelint-plugin-enforce-atomics",
-  "version": "1.0.94",
+  "version": "1.1.0",
   "description": "stylelint plugin to enforce usage of atomic classes",
   "keywords": [
     "stylelint",
@@ -8,8 +8,11 @@
     "tailwind",
     "atomics"
   ],
-  "main": "index.js",
+  "main": "index-test.js",
+  "source": "src/**.ts",
+  "module": "",
   "scripts": {
+    "build": "tsc",
     "jest": "jest"
   },
   "jest": {
@@ -18,11 +21,21 @@
   "author": "Patryk Krasuski",
   "license": "MIT",
   "dependencies": {
-    "jest": "^26.6.3",
     "jest-preset-stylelint": "^3.0.0",
     "stylelint": "^13.13.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-typescript": "^7.16.0",
+    "@types/jest": "^27.0.3",
+    "@types/node": "^16.11.11",
+    "@types/stylelint": "^13.13.3",
+    "babel-jest": "^27.4.2",
+    "jest": "^27.4.3",
+    "ts-jest": "^27.1.0",
+    "typescript": "^4.5.2"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/wolfpoland/enforce-atomics.git"

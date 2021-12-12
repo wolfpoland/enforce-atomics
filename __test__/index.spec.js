@@ -3,7 +3,7 @@
 const {ruleName} = require('../index');
 
 testRule({
-    plugins: ["./index.js"],
+    plugins: ["./__test__/index.ts"],
     ruleName,
     config: [true, {css: 'projekty/enforce-atomics/__test__/test-file.css'}],
 
@@ -49,7 +49,7 @@ testRule({
 });
 
 testRule({
-    plugins: ["./index.js"],
+    plugins: ["./__test__/index.ts"],
     ruleName,
     config: [true, {css: 'projekty/enforce-atomics/__test__/test-file.css', propertiesWhitelist: ['display', 'width']}],
 
