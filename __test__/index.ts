@@ -1,5 +1,5 @@
-import { config } from "../src/config";
 import { messages, run } from "../src/main";
+import { config } from "../src/config";
 
 module.exports = run();
 

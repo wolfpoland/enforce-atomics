@@ -15,6 +15,10 @@
     "build": "tsc",
     "jest": "jest"
   },
+  "files": [
+    "index.js",
+    "dist/*"
+  ],
   "jest": {
     "preset": "jest-preset-stylelint"
   },

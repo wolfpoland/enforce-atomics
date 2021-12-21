@@ -5,7 +5,7 @@ const { ruleName } = require("../index");
 testRule({
   plugins: ["./__test__/index.ts"],
   ruleName,
-  config: [true, { css: "projekty/enforce-atomics/__test__/test-file.css" }],
+  config: [true, { css: "./__test__/test-file.css" }],
 
   accept: [
     {
@@ -54,34 +54,23 @@ testRule({
   config: [
     true,
     {
-      css: "projekty/enforce-atomics/__test__/test-file.css",
-      propertiesWhitelist: ["display", "width"],
-    },
-  ],
-
-  accept: [
-    {
-      code: ".test-class { position: absolute; color: white; background: black; }",
+      css: "./__test__/test-file.css",
     },
   ],
 
   reject: [
     {
-      code: ".test-class { position: absolute; color: white; display: block; background: black; }",
-      message: "Consider use of .test-display-block (plugin/enforce-atomics)",
-    },
-    {
-      code: ".test-class { position: absolute; color: white; display: block; background: black; width: 100%;}",
+      code: ".test-class {  display: block; width: 100%;}",
       warnings: [
         {
           message:
             "Consider use of .test-display-block (plugin/enforce-atomics)",
-          column: 49,
+          column: 16,
           line: 1,
         },
         {
           message: "Consider use of .test-full-width (plugin/enforce-atomics)",
-          column: 84,
+          column: 32,
           line: 1,
         },
       ],
