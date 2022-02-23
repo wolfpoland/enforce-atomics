@@ -1,6 +1,6 @@
 {
   "name": "stylelint-plugin-enforce-atomics",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "stylelint plugin to enforce usage of atomic classes",
   "keywords": [
     "stylelint",
@@ -8,7 +8,7 @@
     "tailwind",
     "atomics"
   ],
-  "main": "index-test.js",
+  "main": "index.js",
   "source": "src/**.ts",
   "module": "",
   "scripts": {
@@ -16,7 +16,7 @@
     "jest": "jest"
   },
   "files": [
-    "index.js",
+    "./index.js",
     "dist/*"
   ],
   "jest": {

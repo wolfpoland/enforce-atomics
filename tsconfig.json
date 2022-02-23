@@ -9,8 +9,15 @@
     "strictPropertyInitialization": true,
     "alwaysStrict": true,
     "sourceMap": false,
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "outDir": "./dist"
   },
-  "lib": ["es2016"]
+  "include": [
+    "./index.js",
+    "./**.ts",
+    "./src/**.ts"
+  ],
+  "lib": [
+    "es2016"
+  ]
 }
+

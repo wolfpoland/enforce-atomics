@@ -4,12 +4,12 @@ import { Selector } from "../../types/selector";
 
 export function parseSourceAndSeedMataData(
   rule: postcss.Rule,
-  selectorsToPropertyPairNode: Map<Selector, Map<PropertyValuePair, postcss.Node | null>>, // bez sensu
+  selectorsToPropertyPairNode: Map<Selector, Map<PropertyValuePair, postcss.Node | null>>,
   propertyValuePairToSelector: Map<PropertyValuePair, Array<Selector>>
 ) {
   const propertyValuePairToNode: Map<PropertyValuePair, postcss.Node | null> = new Map<PropertyValuePair, postcss.Node | null>();
 
-  if (!rule.selector.match("^[\\.]+([a-z]+[-]+[a-z]+[-]*)+$")) {
+  if (!rule.selector.match("^[\\.]+([a-z]+[-]*[a-z]+[-]*)+$")) {
     return;
   }
 
@@ -22,8 +22,14 @@ export function parseSourceAndSeedMataData(
 
     propertyValuePairToSelector.set(propertyValuePair, [...propertiesArr, rule.selector]);
 
-    propertyValuePairToNode.set(propertyValuePair, null); // to bez sesnu
+    propertyValuePairToNode.set(propertyValuePair, null);
   });
 
-  selectorsToPropertyPairNode.set(rule.selector, propertyValuePairToNode); // to pewnie tez
+  if (!parentIsMediaQuery(rule)) {
+    selectorsToPropertyPairNode.set(rule.selector, new Map(propertyValuePairToNode));
+  }
+}
+
+function parentIsMediaQuery(rule: postcss.Rule): boolean {
+  return rule?.parent?.type === "atrule" && rule?.parent?.name === "media";
 }
